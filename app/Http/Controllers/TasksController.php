@@ -13,7 +13,8 @@ class TasksController extends Controller
     {
         // タスク一覧を取得
         $tasks = task::all();
-
+        
+       
         // タスク一覧ビューでそれを表示
         return view('tasks.index', [
             'tasks' => $tasks,
@@ -35,9 +36,15 @@ class TasksController extends Controller
     // postでtasks/にアクセスされた場合の「新規登録処理」
     public function store(Request $request)
     {
+        // バリデーション
+        $request->validate([
+            'status' => 'required|max:10',   // 追加
+            
+        ]);
         // タスクを作成
         $task = new task;
         $task->content = $request->content;
+        $task->status = $request->status;
         $task->save();
 
         // トップページへリダイレクトさせる
@@ -72,8 +79,14 @@ class TasksController extends Controller
     {
         // idの値でタスクを検索して取得
         $task = task::findOrFail($id);
+        // バリデーション
+        $request->validate([
+            'status' => 'required|max:10',   // 追加
+            
+        ]);
         // タスクを更新
         $task->content = $request->content;
+        $task->status = $request->status;
         $task->save();
 
         // トップページへリダイレクトさせる

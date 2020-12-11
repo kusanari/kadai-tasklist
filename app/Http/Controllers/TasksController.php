@@ -12,7 +12,7 @@ class TasksController extends Controller
     public function index()
     {
         // タスク一覧を取得
-        $tasks = task::all();
+        $tasks = Task::all();
         
        
         // タスク一覧ビューでそれを表示
@@ -25,7 +25,7 @@ class TasksController extends Controller
     // getでtasks/createにアクセスされた場合の「新規登録画面表示処理」
     public function create()
     {
-        $task = new task;
+        $task = new Task;
 
         // タスク作成ビューを表示
         return view('tasks.create', [
@@ -43,7 +43,7 @@ class TasksController extends Controller
             
         ]);
         // タスクを作成
-        $task = new task;
+        $task = new Task;
         $task->content = $request->content;
         $task->status = $request->status;
         $task->save();
@@ -55,7 +55,7 @@ class TasksController extends Controller
     public function show($id)
     {
         // idの値でタスクを検索して取得
-        $task = task::findOrFail($id);
+        $task = Task::findOrFail($id);
 
         // タスク詳細ビューでそれを表示
         return view('tasks.show', [
@@ -79,7 +79,7 @@ class TasksController extends Controller
     public function update(Request $request, $id)
     {
         // idの値でタスクを検索して取得
-        $task = task::findOrFail($id);
+        $task = Task::findOrFail($id);
         // バリデーション
         $request->validate([
             'status' => 'required|max:10',   // 追加
@@ -98,7 +98,7 @@ class TasksController extends Controller
     public function destroy($id)
     {
         // idの値でタスクを検索して取得
-        $task = task::findOrFail($id);
+        $task = Task::findOrFail($id);
         // タスクを削除
         $task->delete();
 

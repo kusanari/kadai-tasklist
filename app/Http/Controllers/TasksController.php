@@ -12,13 +12,32 @@ class TasksController extends Controller
     public function index()
     {
         // タスク一覧を取得
-        $tasks = Task::all();
+        // $tasks = Task::all();
         
        
         // タスク一覧ビューでそれを表示
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+        // return view('tasks.index', [
+        //     'tasks' => $tasks,
+        // ]);
+        $data = [];
+        if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+            // ユーザのタスクの一覧を作成日時の降順で取得
+            $tasks = $user->tasklist()->orderBy('created_at', 'desc')->paginate(10);
+
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,//tasls<tasklistに変更
+            ];
+        return view('tasks.index', $data);    
+        }
+        else{
+        // Welcomeビューでそれらを表示
+        return view('welcome', $data);
+        // return view('tasks.index', $data);
+        
+        } 
     }
 
 
@@ -46,6 +65,7 @@ class TasksController extends Controller
         $task = new Task;
         $task->content = $request->content;
         $task->status = $request->status;
+        $task->user_id = \Auth::user()->id;
         $task->save();
 
         // トップページへリダイレクトさせる
@@ -54,6 +74,7 @@ class TasksController extends Controller
      // getでtasks/idにアクセスされた場合の「取得表示処理」
     public function show($id)
     {
+     if (\Auth::check()) {
         // idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
 
@@ -61,11 +82,16 @@ class TasksController extends Controller
         return view('tasks.show', [
             'task' => $task,
         ]);
+        }else{
+        return view('welcome');
+        }
+        
     }
 
     // getでtasks/id/editにアクセスされた場合の「更新画面表示処理」
     public function edit($id)
     {
+    if (\Auth::check()) {
         // idの値でタスクを検索して取得
         $task = task::findOrFail($id);
 
@@ -73,8 +99,10 @@ class TasksController extends Controller
         return view('tasks.edit', [
             'task' => $task,
         ]);
+    }else{
+     return view('welcome');    
     }
-
+}
     // putまたはpatchでtasks/idにアクセスされた場合の「更新処理」
     public function update(Request $request, $id)
     {

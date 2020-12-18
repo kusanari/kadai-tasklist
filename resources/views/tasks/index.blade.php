@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="card-header">
+        <h3 class="card-title">{{ Auth::user()->name }}</h3>
+    </div>
 
     <h1>タスク一覧</h1>
 

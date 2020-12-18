@@ -34,8 +34,9 @@ class TasksController extends Controller
         }
         else{
         // Welcomeビューでそれらを表示
-        return view('welcome', $data);
+        return view('welcome');
         // return view('tasks.index', $data);
+        
         
         } 
     }
@@ -44,12 +45,16 @@ class TasksController extends Controller
     // getでtasks/createにアクセスされた場合の「新規登録画面表示処理」
     public function create()
     {
+    if (\Auth::check()) {    
         $task = new Task;
 
         // タスク作成ビューを表示
         return view('tasks.create', [
             'task' => $task,
         ]);
+    }else{
+        return redirect('/');
+    }
     }
 
     // postでtasks/にアクセスされた場合の「新規登録処理」
@@ -74,16 +79,25 @@ class TasksController extends Controller
      // getでtasks/idにアクセスされた場合の「取得表示処理」
     public function show($id)
     {
-     if (\Auth::check()) {
+     if (!\Auth::check()) {//   認証済みの場合
+     
+        return redirect('/');    
+     }
+    
         // idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
-
+        
+        
+        if (\Auth::id() === $task->user_id) {// 認証済みユーザ（閲覧者）がそのタスクの所有者である場合
         // タスク詳細ビューでそれを表示
-        return view('tasks.show', [
+       
+            return view('tasks.show', [
             'task' => $task,
-        ]);
+            ]);
+            
         }else{
-        return view('welcome');
+           
+            return redirect('/');
         }
         
     }
@@ -91,16 +105,19 @@ class TasksController extends Controller
     // getでtasks/id/editにアクセスされた場合の「更新画面表示処理」
     public function edit($id)
     {
-    if (\Auth::check()) {
-        // idの値でタスクを検索して取得
-        $task = task::findOrFail($id);
+        
+    // idの値でタスクを検索して取得
+        $task = \App\Task::findOrFail($id);
+
+        // 認証済みユーザ（閲覧者）がそのタスクの所有者である場合は、タスクを表示
+        if (\Auth::id() === $task->user_id) {
 
         // タスク編集ビューでそれを表示
         return view('tasks.edit', [
             'task' => $task,
         ]);
     }else{
-     return view('welcome');    
+     return redirect('/');    
     }
 }
     // putまたはpatchでtasks/idにアクセスされた場合の「更新処理」
@@ -118,19 +135,22 @@ class TasksController extends Controller
         $task->status = $request->status;
         $task->save();
 
-        // トップページへリダイレクトさせる
-        return redirect('/');
+        // 前のURLへリダイレクトさせる
+        return back();
     }
 
     // deleteでtasks/idにアクセスされた場合の「削除処理」
     public function destroy($id)
     {
         // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
-        // タスクを削除
-        $task->delete();
+        $task = \App\Task::findOrFail($id);
 
-        // トップページへリダイレクトさせる
-        return redirect('/');
+        // 認証済みユーザ（閲覧者）がそのタスクの所有者である場合は、タスクを削除
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
+
+        // 前のURLへリダイレクトさせる
+        return back();
     }
 }

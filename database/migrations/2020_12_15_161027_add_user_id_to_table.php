@@ -14,9 +14,10 @@ class AddUserIdToTable extends Migration
     public function up()
     {
         Schema::table('tasks', function (Blueprint $table) {
-             $table->string('user_id',10); // user_idカラム追加
-             
-        });
+             $table->unsignedBigInteger('user_id'); // user_idカラム追加
+            // 外部キー制約
+            $table->foreign('user_id')->references('id')->on('users'); 
+        }); 
     }
 
     /**
@@ -26,6 +27,8 @@ class AddUserIdToTable extends Migration
      */
     public function down()
     {
-        $table->dropColumn('user_id');
+       Schema::table('tasks', function (Blueprint $table) {
+            $table->dropColumn('user_id');
+        });
     }
 }

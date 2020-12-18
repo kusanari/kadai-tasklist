@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="card-header">
+        <h3 class="card-title">{{ Auth::user()->name }}</h3>
+    </div>
 
     <h1>id = {{ $task->id }} のタスク詳細ページ</h1>
 
@@ -8,6 +11,7 @@
         <tr>
             <th>id</th>
             <td>{{ $task->id }}</td>
+            
         </tr>
         <tr>
             <th>タスク</th>
